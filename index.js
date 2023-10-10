@@ -3,6 +3,7 @@ require('dotenv').config();
 const app = express();
 const userRoutes = require('./src/routes/user_routes.js')
 
+app.use(express.urlencoded({ extended: true }));
 //Index Routes
 app.get('/',(req, res)=>{
    res.send('Welcome to the small pos api');
