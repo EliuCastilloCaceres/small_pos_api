@@ -8,19 +8,19 @@ const getAllUsers = (req, res) => {
         if (error) {
             return res.status(403).json({ ErrorMessage: 'invalid token' });
         } else {
-                const query = 'select * from users;'
-                db_connection.query(query, (error, result) => {
-                    if (error) {
-                        return res.status(500).json('Server Error: ' + error);
-                    } else {
-                        const data = { message: 'Success', data: result }
-                        return res.status(200).json({data,userData});
-                    }
-                })
-            }
+            const query = 'select * from users;'
+            db_connection.query(query, (error, result) => {
+                if (error) {
+                    return res.status(500).json('Server Error: ' + error);
+                } else {
+                    const data = { message: 'Success', data: result }
+                    return res.status(200).json({ data, userData });
+                }
+            })
+        }
     })
 
-    
+
 }
 
 const getUserById = (req, res) => {
@@ -38,7 +38,7 @@ const getUserById = (req, res) => {
                         return res.status(500).json('Server Error: ' + error);
                     } else {
                         const data = { message: 'Succes', data: result }
-                        return res.status(200).json({data, userData});
+                        return res.status(200).json({ data, userData });
                     }
                 })
             }
@@ -59,7 +59,7 @@ const login = (req, res) => {
                 return res.status(500).json('Server Error: ' + error);
             } else {
                 if (result.length > 0) {
-                    if (password == result[0].password) {
+                    if (bcrypt.compareSync(password, result[0].password)) {
                         delete result[0].password;
                         jwt.sign({ user: result }, process.env.SECRET_KEY, (error, token) => {
                             if (error) {
@@ -68,19 +68,94 @@ const login = (req, res) => {
                                 return res.status(200).json({ message: 'Succes', token: token });
                             }
                         });
-                    }else{
-                        return res.status(401).json({ ErrorMessage: 'incorrect credentials'});
+                    } else {
+                        return res.status(401).json({ ErrorMessage: 'incorrect credentials' });
                     }
-                }else{
-                    return res.status(401).json({ ErrorMessage: 'incorrect credentials'});
+                } else {
+                    return res.status(401).json({ ErrorMessage: 'incorrect credentials' });
                 }
             }
         })
     }
 }
 
-const createUser = () => {
+const createUser = (req, res) => {
+    const firstName = req.body.firstName.trim();
+    const lastName = req.body.lastName.trim();
+    const userName = req.body.userName.trim();
+    const password = bcrypt.hashSync(req.body.password.trim(), 10)
+    const profile = req.body.profile.trim();
+    const position = req.body.position.trim();
+    const adress = req.body.adress.trim();
+    const zipCode = req.body.zipCode.trim();
+    const state = req.body.state.trim();
+    const city = req.body.city.trim();
+    const phoneNumber = req.body.phoneNumber.trim();
+    //formateado de fecha.
+    // const fecha = new Date();
+    // const año = fecha.getFullYear();
+    // const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
+    // const dia = fecha.getDate().toString().padStart(2, '0');
+    // const hora = fecha.getHours().toString().padStart(2, '0');
+    // const minutos = fecha.getMinutes().toString().padStart(2, '0');
+    // const segundos = fecha.getSeconds().toString().padStart(2, '0');
+    // const fechaFormateada = `${año}-${mes}-${dia} ${hora}:${minutos}:${segundos}`;
+    const query =`insert into users (first_name, last_name, user_name, password, profile, position, adress, zip_code, state, city, phone_number)
+    values('${firstName}','${lastName}','${userName}','${password}','${profile}','${position}','${adress}','${zipCode}','${state}','${city}','${phoneNumber}')`
 
+    db_connection.query(query,(error,result)=>{
+        if (error) {
+            return res.status(500).json('Server Error: ' + error);
+        } else {
+           
+            return res.status(201).json({ message: 'User created successfully'});
+        }
+    })
+}
+const updateUser = (req, res) => {
+    const userId = req.params.userId;
+    const firstName = req.body.firstName.trim();
+    const lastName = req.body.lastName.trim();
+    const userName = req.body.userName.trim();
+    const password = req.body.password.trim();
+    const profile = req.body.profile.trim();
+    const position = req.body.position.trim();
+    const adress = req.body.adress.trim();
+    const zipCode = req.body.zipCode.trim();
+    const state = req.body.state.trim();
+    const city = req.body.city.trim();
+    const phoneNumber = req.body.phoneNumber.trim();
+    let query='';
+
+    if(password!=''){
+        const newPassword = bcrypt.hashSync(password, 10);
+        query =`update users set first_name='${firstName}', last_name='${lastName}', user_name='${userName}', password='${newPassword}', profile='${profile}', position='${position}', 
+        adress='${adress}', zip_code='${zipCode}', state='${state}', city='${city}', phone_number='${phoneNumber}' where user_id=${userId}`
+    }else{
+        query =`update users set first_name='${firstName}', last_name='${lastName}', user_name='${userName}', profile='${profile}', position='${position}', 
+        adress='${adress}', zip_code='${zipCode}', state='${state}', city='${city}', phone_number='${phoneNumber}' where user_id=${userId}`
+    }
+    db_connection.query(query,(error,result)=>{
+        if (error) {
+            return res.status(500).json('Server Error: ' + error);
+        } else {
+           
+            return res.status(200).json({ message: 'User updated successfully'});
+        }
+    })
+}
+const deleteUser = (req, res) => {
+    const userId = req.params.userId;
+    
+    const query=`update users set is_active=0 where user_id=${userId}`;
+    db_connection.query(query,(error,result)=>{
+        if (error) {
+            return res.status(500).json('Server Error: ' + error);
+        } else {
+           
+            return res.status(200).json({ message: 'User deleted successfully'});
+        }
+    })
 }
 
-module.exports = { getAllUsers, getUserById, login }
+module.exports = { getAllUsers, getUserById, login, createUser, updateUser, deleteUser }
