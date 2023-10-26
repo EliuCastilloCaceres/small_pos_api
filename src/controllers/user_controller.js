@@ -6,7 +6,7 @@ const getAllUsers = (req, res) => {
 
     jwt.verify(req.token, process.env.SECRET_KEY, (error, userData) => {
         if (error) {
-            return res.status(403).json({ ErrorMessage: 'invalid token' });
+            return res.status(403).json({ errorMessage: 'invalid token' });
         } else {
             const query = 'select * from users;'
             db_connection.query(query, (error, result) => {
@@ -26,7 +26,7 @@ const getAllUsers = (req, res) => {
 const getUserById = (req, res) => {
     jwt.verify(req.token, process.env.SECRET_KEY, (error, userData) => {
         if (error) {
-            return res.status(403).json({ ErrorMessage: 'invalid token' });
+            return res.status(403).json({ errorMessage: 'invalid token' });
         } else {
             const userId = parseInt(req.params.userId.trim());
             const query = `select * from users where user_id=${userId}`;
@@ -48,12 +48,13 @@ const getUserById = (req, res) => {
 }
 
 const login = (req, res) => {
-    const username = req.body.username.trim();
-    const password = req.body.password.trim();
+    const username = req.body.username;
+    const password = req.body.password;
+    //console.log(req);
     if (username == "" || password == "") {
         return res.status(404).json({ ErrorMessage: 'Password or username field is empty' });
     } else {
-        const query = `select * from users where user_name='${username}'`;
+        const query = `select * from users where user_name='${username}' AND is_active = 1`;
         db_connection.query(query, (error, result) => {
             if (error) {
                 return res.status(500).json('Server Error: ' + error);
@@ -63,16 +64,16 @@ const login = (req, res) => {
                         delete result[0].password;
                         jwt.sign({ user: result }, process.env.SECRET_KEY, (error, token) => {
                             if (error) {
-                                return res.status(500).json({ ErrorMessage: 'Unexpected error generating token ' + error })
+                                return res.status(500).json({ errorMessage: 'Unexpected error generating token ' + error })
                             } else {
-                                return res.status(200).json({ message: 'Succes', token: token });
+                                return res.status(200).json({ message: 'Succes', token: token, user:result[0]});
                             }
                         });
                     } else {
-                        return res.status(401).json({ ErrorMessage: 'incorrect credentials' });
+                        return res.status(401).json({ errorMessage: 'incorrect credentials' });
                     }
                 } else {
-                    return res.status(401).json({ ErrorMessage: 'incorrect credentials' });
+                    return res.status(401).json({ errorMessage: 'incorrect credentials' });
                 }
             }
         })

@@ -8,7 +8,7 @@ const ensureToken = (req,res,next) => {
         next();
     }else{
       
-       return res.status(403).json({ErrorMEssage:'Access denied, must authenticate'})
+       return res.status(403).json({errorMessage:'Access denied, must authenticate'})
     }
 }
 exports.ensureToken = ensureToken;

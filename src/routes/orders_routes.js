@@ -3,6 +3,7 @@ const router = express.Router();
 const ordersController = require('../controllers/orders_controller.js');
 const ensureToken = require('../middlewares/ensureToken.js');
 
+router.get('/orders',ensureToken.ensureToken,ordersController.getAllorders);
 router.post('/orders/create',ensureToken.ensureToken,ordersController.createOrder);
 router.put('/orders/update/:orderId',ensureToken.ensureToken,ordersController.updatedOrder);
 router.delete('/orders/cancel/:orderId',ensureToken.ensureToken,ordersController.cancelOrder);
