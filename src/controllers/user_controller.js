@@ -13,8 +13,7 @@ const getAllUsers = (req, res) => {
                 if (error) {
                     return res.status(500).json('Server Error: ' + error);
                 } else {
-                    const data = { message: 'Success', data: result }
-                    return res.status(200).json({ data, userData });
+                    return res.status(200).json({ message: 'Success', data: result });
                 }
             })
         }

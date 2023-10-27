@@ -2,6 +2,17 @@ const db_connection = require('../../db_connection.js');
 const {IsANumber} = require('../../helpers.js');
 
 //--------------------------------------------------*** Products Section *---------------------------------------/
+const getAllProducts = (req,res)=>{
+    
+    const query = `select * from products where is_active = 1`
+    db_connection.query(query,(error, result)=>{
+        if(error){
+            return res.status(500).json('Server Error: ' + error);
+        }else{
+            return res.status(200).json({message:`Success query`, data:result});
+        }
+    })
+}
 const createProduct = (req, res) =>{
     const isVariable = req.body.isVariable.trim();
     let sku = req.body.sku.trim();
@@ -243,5 +254,5 @@ module.exports={
     getSizesByProductId,updateSizeBySizeId, 
     deleteSizeBySizeId, createSizeByProductId, 
     createReturnDetails, createReturn, updateReturn,
-    deleteReturn
+    deleteReturn, getAllProducts
 }

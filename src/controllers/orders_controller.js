@@ -4,7 +4,7 @@ const db_connection = require('../../db_connection.js');
 
 const getAllorders = (req,res)=>{
     
-    const query = `SELECT order_id, sub_total,discount,total,payment_method,information,status,order_date, customers.first_name as customer_firstname,customers.last_name as customer_lastname,users.first_name as user_firstname, users.last_name as user_lastname 
+    const query = `SELECT order_id, sub_total,discount,total,payment_method,information,status,order_date, customers.first_name as customer_firstname,customers.last_name as customer_lastname,users.first_name as user_firstname, users.last_name as user_lastname, orders.customer_id, orders.user_id 
     FROM orders 
     inner join customers on orders.customer_id = customers.customer_id 
     INNER JOIN users on orders.user_id = users.user_id`
@@ -16,7 +16,22 @@ const getAllorders = (req,res)=>{
         }
     })
 }
+const getOrderById = (req,res)=>{
 
+    const orderId = parseInt(req.params.orderId);
+    
+    const query = `SELECT order_id, sub_total,discount,total,payment_method,information,status,order_date, customers.first_name as customer_firstname,customers.last_name as customer_lastname,users.first_name as user_firstname, users.last_name as user_lastname, orders.customer_id, orders.user_id
+    FROM orders 
+    inner join customers on orders.customer_id = customers.customer_id 
+    INNER JOIN users on orders.user_id = users.user_id where order_id =${orderId}`
+    db_connection.query(query,(error, result)=>{
+        if(error){
+            return res.status(500).json('Server Error: ' + error);
+        }else{
+            return res.status(200).json({message:`Success query`, data:result});
+        }
+    })
+}
 const createOrder = (req,res)=>{
    
     const subTotal = req.body.subTotal.trim();
@@ -139,5 +154,5 @@ module.exports =
 {
     createOrderDetails, updatedOrderDetails,
     deleteOrderDetails, createOrder, updatedOrder,
-    cancelOrder, getAllorders
+    cancelOrder, getAllorders,getOrderById
 }

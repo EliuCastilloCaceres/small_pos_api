@@ -3,6 +3,7 @@ const router = express.Router();
 const productsController = require('../controllers/products_controller.js');
 const ensureToken = require('../middlewares/ensureToken.js');
 
+router.get('/products',ensureToken.ensureToken, productsController.getAllProducts);
 router.post('/products/create',ensureToken.ensureToken, productsController.createProduct);
 router.put('/products/update/:productId',ensureToken.ensureToken, productsController.updateProduct);
 router.delete('/products/delete/:productId',ensureToken.ensureToken, productsController.deleteProduct);

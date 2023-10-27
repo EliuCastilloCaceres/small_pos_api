@@ -1,6 +1,17 @@
 const { query } = require('express');
 const db_connection = require('../../db_connection.js');
 
+const getAllCustomers = (req,res)=>{
+    
+    const query = `select * from customers`
+    db_connection.query(query,(error, result)=>{
+        if(error){
+            return res.status(500).json('Server Error: ' + error);
+        }else{
+            return res.status(200).json({message:`Success query`, data:result});
+        }
+    })
+}
 const createCustomer =(req,res)=>{
 
     const firstName = req.body.firstName.trim();
@@ -70,5 +81,5 @@ const deleteCustomer =(req,res)=>{
 
 module.exports =
 {
-    createCustomer,updateCustomer,deleteCustomer
+    createCustomer,updateCustomer,deleteCustomer,getAllCustomers
 }
