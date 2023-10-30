@@ -13,6 +13,17 @@ const getAllProducts = (req,res)=>{
         }
     })
 }
+const getProductById = (req,res)=>{
+    const productId = req.params.productId;
+    const query = `select * from products where product_id=${productId} AND is_active = 1`
+    db_connection.query(query,(error, result)=>{
+        if(error){
+            return res.status(500).json('Server Error: ' + error);
+        }else{
+            return res.status(200).json({message:`Success query`, data:result});
+        }
+    })
+}
 const createProduct = (req, res) =>{
     const isVariable = req.body.isVariable.trim();
     let sku = req.body.sku.trim();
@@ -26,7 +37,7 @@ const createProduct = (req, res) =>{
     const image = req.body.image.trim();
     const providerId = req.body.providerId.trim();
 
-    if(isVariable == 1) sku='';
+    if(isVariable) sku='';
 
     const query = `insert into products (is_variable, sku, name, description, color, purchase_price, sale_price, general_stock,
         uom, image, provider_id) values (${isVariable}, '${sku}', '${name}', '${description}', '${color}', ${purchasePrice}, ${salePrice}, ${generalStock},
@@ -41,18 +52,18 @@ const createProduct = (req, res) =>{
 
 }
 const updateProduct = (req, res) =>{
-    const productId = req.params.productId.trim();
-    const isVariable = req.body.isVariable.trim();
+    const productId = req.params.productId;
+    const isVariable = req.body.isVariable;
     let sku = req.body.sku.trim();
     const name = req.body.name.trim();
     const description = req.body.description.trim();
     const color = req.body.color.trim();
-    const purchasePrice = req.body.purchasePrice.trim();
-    const salePrice = req.body.salePrice.trim();
-    const generalStock = req.body.generalStock.trim();
+    const purchasePrice = req.body.purchasePrice;
+    const salePrice = req.body.salePrice;
+    const generalStock = req.body.generalStock;
     const uom = req.body.uom.trim();
     const image = req.body.image.trim();
-    const providerId = req.body.providerId.trim();
+    const providerId = req.body.providerId;
 
     if(isVariable == 1) sku='';
 
@@ -254,5 +265,5 @@ module.exports={
     getSizesByProductId,updateSizeBySizeId, 
     deleteSizeBySizeId, createSizeByProductId, 
     createReturnDetails, createReturn, updateReturn,
-    deleteReturn, getAllProducts
+    deleteReturn, getAllProducts,getProductById
 }
