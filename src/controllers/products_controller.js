@@ -62,7 +62,7 @@ const updateProduct = (req, res) =>{
     const salePrice = req.body.salePrice;
     const generalStock = req.body.generalStock;
     const uom = req.body.uom.trim();
-    const image = req.body.image.trim();
+    const image = req.file.filename;
     const providerId = req.body.providerId;
 
     if(isVariable == 1) sku='';

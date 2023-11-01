@@ -3,7 +3,9 @@ const path = require('path');
 const productImageUploadConfig = multer.diskStorage({
     destination: path.join(__dirname+'../../../public/images/products'),
     filename: function (req, file, cb) {
-      return cb(null, file.originalname)
+      const splitExtension = file.mimetype.split('/')
+      const extension=`.${splitExtension[1]}`
+      return cb(null, req.params.productId+extension)
     }
   })
   
