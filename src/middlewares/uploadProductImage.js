@@ -5,7 +5,8 @@ const productImageUploadConfig = multer.diskStorage({
     filename: function (req, file, cb) {
       const splitExtension = file.mimetype.split('/')
       const extension=`.${splitExtension[1]}`
-      return cb(null, req.params.productId+extension)
+      
+      return cb(null, req.params.productId+'-'+Date.now()+extension)
     }
   })
   
