@@ -25,19 +25,21 @@ const getProductById = (req, res) => {
     })
 }
 const createProduct = (req, res) => {
-    const isVariable = req.body.isVariable.trim();
-    let sku = req.body.sku.trim();
-    const name = req.body.name.trim();
+    console.log(req.body)
+    let isVariable = req.body.isVariable ? 1 : 0;
+    let sku = req.body.sku;
+    const name = req.body.name;
     const description = req.body.description.trim();
-    const color = req.body.color.trim();
-    const purchasePrice = req.body.purchasePrice.trim();
-    const salePrice = req.body.salePrice.trim();
-    const generalStock = req.body.generalStock.trim();
-    const uom = req.body.uom.trim();
-    const image = req.body.image
-    const providerId = req.body.providerId.trim();
-
-    if (isVariable) sku = '';
+    const color = req.body.color;
+    const purchasePrice = req.body.purchasePrice;
+    const salePrice = req.body.salePrice;
+    const generalStock = req.body.generalStock;
+    const uom = req.body.uom;
+    const providerId = req.body.providerId;
+    let image = ''
+    if (req.file) {
+        image = req.file.filename
+    }
 
     const query = `insert into products (is_variable, sku, name, description, color, purchase_price, sale_price, general_stock,
         uom, image, provider_id) values (${isVariable}, '${sku}', '${name}', '${description}', '${color}', ${purchasePrice}, ${salePrice}, ${generalStock},
