@@ -29,7 +29,7 @@ const createProduct = (req, res) => {
     let isVariable = req.body.isVariable ? 1 : 0;
     let sku = req.body.sku;
     const name = req.body.name;
-    const description = req.body.description.trim();
+    const description = req.body.description;
     const color = req.body.color;
     const purchasePrice = req.body.purchasePrice;
     const salePrice = req.body.salePrice;
