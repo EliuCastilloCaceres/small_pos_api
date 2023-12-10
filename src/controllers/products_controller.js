@@ -4,7 +4,7 @@ const { IsANumber } = require('../../helpers.js');
 //--------------------------------------------------*** Products Section *---------------------------------------/
 const getAllProducts = (req, res) => {
 
-    const query = `select * from products where is_active = 1`
+    const query = `select * from products where is_active = 1 ORDER BY product_id DESC`
     db_connection.query(query, (error, result) => {
         if (error) {
             return res.status(500).json('Server Error: ' + error);

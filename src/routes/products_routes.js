@@ -6,7 +6,7 @@ const upload = require('../middlewares/uploadProductImage.js');
 
 router.get('/products',ensureToken.ensureToken, productsController.getAllProducts);
 router.get('/products/:productId',ensureToken.ensureToken, productsController.getProductById);
-router.post('/products/create',ensureToken.ensureToken, productsController.createProduct);
+router.post('/products/create',ensureToken.ensureToken, upload.productimgupload, productsController.createProduct);
 router.put('/products/update/:productId',ensureToken.ensureToken,upload.productimgupload, productsController.updateProduct);
 router.delete('/products/delete/:productId',ensureToken.ensureToken, productsController.deleteProduct);
 
