@@ -188,7 +188,7 @@ const createReturnDetails = (req, res) => {
 }
 //--------------------------------------------------*** END Returns Section *---------------------------------------/
 
-//--------------------------------------------------*** END Sizes Section *---------------------------------------/
+//--------------------------------------------------*** Sizes Section *---------------------------------------/
 const getSizesByProductId = (req, res) => {
 
     const productId = req.params.productId.trim();
@@ -208,18 +208,37 @@ const getSizesByProductId = (req, res) => {
     }
 }
 const createSizeByProductId = (req, res) => {
-
-    const productId = req.params.productId.trim();
-    const size = req.body.size.trim();
-    const sku = req.body.sku.trim();
-    const stock = parseFloat(req.body.stock.trim());
+    console.log(req.body)
+    const productId = parseInt(req.params.productId)
+    const size = req.body.size
+    const sku = req.body.sku
+    const stock = parseFloat(req.body.stock)
+    console.log(productId)
+    console.log(size)
+    console.log(sku)
+    console.log(stock)
+    const skuQuery = `select * from sizes where sku ='${sku}'`
     if (IsANumber(productId)) {
-        const query = `insert into sizes (size, sku, stock, product_id) values (${size}, ${sku}, ${stock}, ${productId})`;
-        db_connection.query(query, (error, result) => {
+        db_connection.query(skuQuery, (error, result) => {
             if (error) {
+                
                 return res.status(500).json('Server Error: ' + error);
             } else {
-                return res.status(200).json({ message: `Size created to product with id: ${productId} successfully` });
+                if (result.length > 0) {
+                   
+                    return res.status(400).json({ message: `the sku already exists in the database` });
+                }else{
+                    const values =[size,sku,stock,productId]
+                    const query = `insert into sizes (size, sku, stock, product_id) values (?,?,?,?)`;
+                    db_connection.query(query,values, (error, result) => {
+                        if (error) {
+                           
+                            return res.status(500).json('Server Error: ' + error);
+                        } else {
+                            return res.status(200).json({ message: `Size created to product with id: ${productId} successfully` });
+                        }
+                    })
+                }
             }
         })
 
