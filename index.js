@@ -12,7 +12,7 @@ const customersRoutes = require('./src/routes/customers_routes.js')
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
-app.use('/product/images',express.static(path.join(__dirname+'/public/images/products')))
+app.use('/product/images',express.static(path.join(__dirname,'/public/images/products')))
 //Index Routes
 app.get('/',(req, res)=>{
    res.send('Welcome to the small pos api');

@@ -1,4 +1,4 @@
-const { query } = require('express');
+
 const db_connection = require('../../db_connection.js');
 
 const getAllCustomers = (req,res)=>{

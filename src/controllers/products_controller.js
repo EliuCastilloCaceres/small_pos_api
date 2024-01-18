@@ -26,6 +26,7 @@ const getProductById = (req, res) => {
 }
 const createProduct = (req, res) => {
     console.log(req.body)
+    console.log(req.file)
     let isVariable = req.body.isVariable ? 1 : 0;
     let sku = req.body.sku;
     const name = req.body.name;
@@ -34,23 +35,36 @@ const createProduct = (req, res) => {
     const purchasePrice = req.body.purchasePrice;
     const salePrice = req.body.salePrice;
     const generalStock = req.body.generalStock;
-    const uom = req.body.uom;
+    const uom = req.body.uom??"";
     const providerId = req.body.providerId;
     let image = ''
     if (req.file) {
         image = req.file.filename
     }
+    const skuQuery = `select * from products where sku ='${sku}'`
+   
+        db_connection.query(skuQuery, (error, result) => {
+            if (error) {
+                return res.status(500).json('Server Error: ' + error);
+            } else {
+                if (result.length > 0 && result[0].sku!='') {
+                        return res.status(400).json({ message: `the sku already exists in the database` });
+                }else{
+                    const query = `insert into products (is_variable, sku, name, description, color, purchase_price, sale_price, general_stock,
+                        uom, image, provider_id) values (${isVariable}, '${sku}', '${name}', '${description}', '${color}', ${purchasePrice}, ${salePrice}, ${generalStock},
+                        '${uom}', '${image}', ${providerId})`;
+                    db_connection.query(query, (error, result) => {
+                        if (error) {
+                            return res.status(500).json('Server Error: ' + error);
+                        } else {
+                            return res.status(200).json({ message: `Product created successfully` });
+                        }
+                    })
+                }
+            }
+        })
 
-    const query = `insert into products (is_variable, sku, name, description, color, purchase_price, sale_price, general_stock,
-        uom, image, provider_id) values (${isVariable}, '${sku}', '${name}', '${description}', '${color}', ${purchasePrice}, ${salePrice}, ${generalStock},
-        '${uom}', '${image}', ${providerId})`;
-    db_connection.query(query, (error, result) => {
-        if (error) {
-            return res.status(500).json('Server Error: ' + error);
-        } else {
-            return res.status(200).json({ message: `Product created successfully` });
-        }
-    })
+   
 
 }
 const updateProduct = (req, res) => {
@@ -224,9 +238,8 @@ const createSizeByProductId = (req, res) => {
                 
                 return res.status(500).json('Server Error: ' + error);
             } else {
-                if (result.length > 0) {
-                   
-                    return res.status(400).json({ message: `the sku already exists in the database` });
+                if (result.length > 0 && result[0].sku!='') {
+                        return res.status(400).json({ message: `the sku already exists in the database` });
                 }else{
                     const values =[size,sku,stock,productId]
                     const query = `insert into sizes (size, sku, stock, product_id) values (?,?,?,?)`;
@@ -235,7 +248,15 @@ const createSizeByProductId = (req, res) => {
                            
                             return res.status(500).json('Server Error: ' + error);
                         } else {
-                            return res.status(200).json({ message: `Size created to product with id: ${productId} successfully` });
+                            const findLastSizeIdQuery = 'SELECT size_id FROM sizes order by size_id DESC LIMIT 1'
+                            db_connection.query(findLastSizeIdQuery,(error,result)=>{
+                                if(error){
+                                    return res.status(500).json('Server Error finding last id: ' + error);
+                                }else{
+                                    return res.status(200).json({lastSizeIdCreated:result[0].size_id, message: `Size created to product with id: ${productId} successfully` });
+                                }
+                            })
+                            
                         }
                     })
                 }
@@ -249,12 +270,13 @@ const createSizeByProductId = (req, res) => {
 
 const updateSizeBySizeId = (req, res) => {
 
-    const sizeId = req.params.sizeId.trim();
-    const size = req.body.size.trim();
-    const sku = req.body.sku.trim();
-    const stock = parseFloat(req.body.stock.trim());
-    if (IsANumber(sizeId)) {
-        const query = `update sizes set size=${size}, sku=${sku}, stock=${stock} where size_id=${sizeId}`;
+    console.log(req.body)
+    const sizeId = req.params.sizeId;
+    const size = req.body.size;
+    const sku = req.body.sku;
+    const stock = parseFloat(req.body.stock);
+    
+        const query = `update sizes set size='${size}', sku='${sku}', stock=${stock} where size_id=${sizeId}`;
         db_connection.query(query, (error, result) => {
             if (error) {
                 return res.status(500).json('Server Error: ' + error);
@@ -263,9 +285,7 @@ const updateSizeBySizeId = (req, res) => {
             }
         })
 
-    } else {
-        return res.status(404).json({ ErrorMessage: 'the sizeId param ' + sizeId + ' must be an integer' })
-    }
+    
 }
 const deleteSizeBySizeId = (req, res) => {
 

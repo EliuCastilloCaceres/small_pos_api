@@ -8,7 +8,7 @@ const getAllUsers = (req, res) => {
         if (error) {
             return res.status(403).json({ errorMessage: 'invalid token' });
         } else {
-            const query = 'select * from users;'
+            const query = 'select * from users where is_active = 1 ORDER BY user_id DESC;'
             db_connection.query(query, (error, result) => {
                 if (error) {
                     return res.status(500).json('Server Error: ' + error);
@@ -157,5 +157,19 @@ const deleteUser = (req, res) => {
         }
     })
 }
+//------------------------------Permissions Section-----------------------------------------
 
-module.exports = { getAllUsers, getUserById, login, createUser, updateUser, deleteUser }
+const getPermissionsByUserId = (req, res)=>{
+    
+    const userId = req.params.userId
+    const userPermissionsQuery=`select * from permissions where user_Id = ${userId}`
+    db_connection.query(userPermissionsQuery,(error,result)=>{
+        if(error){
+            return res.status(500).json('Server Error: ' + error);
+        }else{
+            return res.status(200).json({ message: 'Succes Query', data:result});
+        }
+    }) 
+}
+
+module.exports = { getAllUsers, getUserById, login, createUser, updateUser, deleteUser, getPermissionsByUserId }
