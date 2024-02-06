@@ -16,6 +16,53 @@ const getAllorders = (req,res)=>{
         }
     })
 }
+const getDayOrders = (req,res)=>{
+  
+   const today = req.params.today
+   //console.log(today)
+     const query = `SELECT order_id, sub_total,discount,total,payment_method,information,status,order_date, customers.first_name as customer_firstname,customers.last_name as customer_lastname,users.first_name as user_firstname, users.last_name as user_lastname, orders.customer_id, orders.user_id 
+    FROM orders 
+    inner join customers on orders.customer_id = customers.customer_id 
+    INNER JOIN users on orders.user_id = users.user_id where orders.order_date >= '${today}' order by orders.order_date desc`
+    // const query = `select * from orders where order_date >= '${today}'`
+    db_connection.query(query,(error, result)=>{
+        if(error){
+            return res.status(500).json('Server Error: ' + error);
+        }else{
+            //console.log(result)
+            return res.status(200).json({message:`Success query`, data:result});
+        }
+    })
+}
+const getOrdersByDateRange = (req,res)=>{
+    console.log(req.params)
+    const startDate = req.params.startDate
+    const endDate = req.params.endDate
+    const order = req.params.order
+    let queryPatch
+    let query
+   if(startDate == 'undefined'){
+    queryPatch = `<= '${endDate} 23:59:59'`
+    
+   }else if(endDate =='undefined'){
+    queryPatch = `>= '${startDate}'`
+   }else{
+    queryPatch=`between '${startDate}' and '${endDate} 23:59:59'`
+   }
+   query = `SELECT order_id, sub_total,discount,total,payment_method,information,status,order_date, customers.first_name as customer_firstname,customers.last_name as customer_lastname,users.first_name as user_firstname, users.last_name as user_lastname, orders.customer_id, orders.user_id 
+   FROM orders 
+   inner join customers on orders.customer_id = customers.customer_id 
+   INNER JOIN users on orders.user_id = users.user_id where orders.order_date ${queryPatch} order by orders.order_date ${order}` 
+     //console.log(query)
+     db_connection.query(query,(error, result)=>{
+         if(error){
+             return res.status(500).json('Server Error: ' + error);
+         }else{
+             //console.log(result)
+             return res.status(200).json({message:`Success query`, data:result});
+         }
+     })
+ }
 const getOrderById = (req,res)=>{
 
     const orderId = parseInt(req.params.orderId);
@@ -28,6 +75,7 @@ const getOrderById = (req,res)=>{
         if(error){
             return res.status(500).json('Server Error: ' + error);
         }else{
+            //console.log(result)
             return res.status(200).json({message:`Success query`, data:result});
         }
     })
@@ -56,19 +104,21 @@ const createOrder = (req,res)=>{
     })
 }
 const updatedOrder = (req,res)=>{
-    const orderId = req.params.orderId.trim();
-    const subTotal = req.body.subTotal.trim();
-    const discount = req.body.discount.trim();
-    const total = req.body.total.trim();
-    const paymentMethod = req.body.paymentMethod.trim();
-    const information = req.body.information.trim();
-    const customerId = req.body.customerId.trim();
-    const userId = req.body.userId.trim();
+    console.log(req.body)
+    const orderId = parseInt(req.params.orderId);
+    const subTotal = req.body.subTotal;
+    const discount = req.body.discount;
+    const total = req.body.total;
+    const paymentMethod = req.body.paymentMethod;
+    const information = req.body.information;
+    const customerId = req.body.customerId;
+    const status = req.body.status;
+    const userId = req.body.userId;
 
     const values = [subTotal,discount,total,
-        paymentMethod,information,customerId,userId];
+        paymentMethod,information,status,customerId,userId];
 
-    const query = `update orders set sub_total=?, discount=?, total=?, payment_method=?, information=?, customer_id=?, user_id=? where order_id =${orderId} `
+    const query = `update orders set sub_total=?, discount=?, total=?, payment_method=?, information=?, status=?, customer_id=?, user_id=? where order_id =${orderId} `
 
     db_connection.query(query, values,(error, result)=>{
         if(error){
@@ -78,10 +128,12 @@ const updatedOrder = (req,res)=>{
         }
     })
 }
-const cancelOrder = (req,res)=>{
-    const orderId = req.params.orderId.trim();
+const changeOrderStatus = (req,res)=>{
+    console.log(req.body)
+    const orderId = parseInt(req.body.orderId);
+    const status = req.body.status
    
-    const query = `update orders set status = 'cancelado' where order_id = ${orderId}`
+    const query = `update orders set status = '${status}' where order_id = ${orderId}`
 
     db_connection.query(query, (error, result)=>{
         if(error){
@@ -154,5 +206,5 @@ module.exports =
 {
     createOrderDetails, updatedOrderDetails,
     deleteOrderDetails, createOrder, updatedOrder,
-    cancelOrder, getAllorders,getOrderById
+    changeOrderStatus, getAllorders,getOrderById,getDayOrders,getOrdersByDateRange
 }

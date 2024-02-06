@@ -8,6 +8,7 @@ router.get('/products',ensureToken.ensureToken, productsController.getAllProduct
 router.get('/products/:productId',ensureToken.ensureToken, productsController.getProductById);
 router.post('/products/create',ensureToken.ensureToken, upload.productimgupload, productsController.createProduct);
 router.put('/products/update/:productId',ensureToken.ensureToken,upload.productimgupload, productsController.updateProduct);
+router.put('/products/generalstock/:productId/update',ensureToken.ensureToken, productsController.updateGeneralStock);
 router.delete('/products/delete/:productId',ensureToken.ensureToken, productsController.deleteProduct);
 
 router.post('/products/returns/create',ensureToken.ensureToken, productsController.createReturn);

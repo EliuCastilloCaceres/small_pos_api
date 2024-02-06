@@ -3,15 +3,19 @@ require('dotenv').config();
 const cors = require('cors');
 const app = express();
 const path = require('path');
+const cookieParser = require('cookie-parser')
 const userRoutes = require('./src/routes/user_routes.js')
 const productsRoutes = require('./src/routes/products_routes.js')
 const providersRoutes = require('./src/routes/providers_routes.js')
 const ordersRoutes = require('./src/routes/orders_routes.js')
 const cashRegistersRoutes = require('./src/routes/cash_registers_routes.js')
 const customersRoutes = require('./src/routes/customers_routes.js')
+
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
+app.use(cookieParser());
 app.use('/product/images',express.static(path.join(__dirname,'/public/images/products')))
 //Index Routes
 app.get('/',(req, res)=>{

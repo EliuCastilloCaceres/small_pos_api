@@ -3,7 +3,7 @@ const db_connection = require('../../db_connection.js');
 
 const getAllCustomers = (req,res)=>{
     
-    const query = `select * from customers`
+    const query = `select * from customers where is_active=1 ORDER BY customer_id DESC`
     db_connection.query(query,(error, result)=>{
         if(error){
             return res.status(500).json('Server Error: ' + error);
@@ -11,6 +11,18 @@ const getAllCustomers = (req,res)=>{
             return res.status(200).json({message:`Success query`, data:result});
         }
     })
+}
+const getCustomerById = (req,res)=>{
+    const customerId = parseInt(req.params.customerId)
+    const query = `select * from customers where is_active=1 and customer_id = ${customerId}`
+    db_connection.query(query,(error, result)=>{
+        if(error){
+            return res.status(500).json('Server Error: ' + error);
+        }else{
+            return res.status(200).json({message:`Success query`, data:result});
+        }
+    })
+
 }
 const createCustomer =(req,res)=>{
 
@@ -81,5 +93,5 @@ const deleteCustomer =(req,res)=>{
 
 module.exports =
 {
-    createCustomer,updateCustomer,deleteCustomer,getAllCustomers
+    createCustomer,updateCustomer,deleteCustomer,getAllCustomers, getCustomerById
 }

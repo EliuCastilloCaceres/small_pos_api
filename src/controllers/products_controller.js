@@ -115,6 +115,20 @@ const deleteProduct = (req, res) => {
     })
 
 }
+const updateGeneralStock = (req, res) => {
+    const productId = req.params.productId.trim();
+    const generalStock = req.body.generalStock
+
+    const query = `update products set general_stock = ${generalStock} where product_id = ${productId}`;
+    db_connection.query(query, (error, result) => {
+        if (error) {
+            return res.status(500).json('Server Error: ' + error);
+        } else {
+            return res.status(200).json({ message: `stock of product with id: ${productId} updated successfully` });
+        }
+    })
+
+}
 
 
 
@@ -311,5 +325,5 @@ module.exports = {
     getSizesByProductId, updateSizeBySizeId,
     deleteSizeBySizeId, createSizeByProductId,
     createReturnDetails, createReturn, updateReturn,
-    deleteReturn, getAllProducts, getProductById
+    deleteReturn, getAllProducts, getProductById,updateGeneralStock
 }
