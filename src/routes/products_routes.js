@@ -16,7 +16,7 @@ router.post('/products/:productId/returns/:returnId/details/create',ensureToken.
 router.put('/products/returns/update/:returnId',ensureToken.ensureToken, productsController.updateReturn);
 router.delete('/products/returns/delete/:returnId',ensureToken.ensureToken, productsController.deleteReturn);
 
-
+router.get('/products/all/sizes',ensureToken.ensureToken,productsController.getAllSizes);
 router.get('/products/:productId/sizes',ensureToken.ensureToken,productsController.getSizesByProductId);
 router.post('/products/:productId/sizes/create',ensureToken.ensureToken, productsController.createSizeByProductId);
 router.put('/products/sizes/:sizeId/update',ensureToken.ensureToken,productsController.updateSizeBySizeId);

@@ -217,6 +217,18 @@ const createReturnDetails = (req, res) => {
 //--------------------------------------------------*** END Returns Section *---------------------------------------/
 
 //--------------------------------------------------*** Sizes Section *---------------------------------------/
+const getAllSizes = (req, res) => {
+        const query = `select * from sizes`;
+        db_connection.query(query, (error, result) => {
+            if (error) {
+                return res.status(500).json('Server Error: ' + error);
+            } else {
+                return res.status(200).json({ message: 'Succes Query', data: result });
+            }
+        })
+
+    
+}
 const getSizesByProductId = (req, res) => {
 
     const productId = req.params.productId.trim();
@@ -325,5 +337,5 @@ module.exports = {
     getSizesByProductId, updateSizeBySizeId,
     deleteSizeBySizeId, createSizeByProductId,
     createReturnDetails, createReturn, updateReturn,
-    deleteReturn, getAllProducts, getProductById,updateGeneralStock
+    deleteReturn, getAllProducts, getProductById,updateGeneralStock,getAllSizes
 }
