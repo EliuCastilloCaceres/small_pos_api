@@ -8,7 +8,7 @@ const productImageUploadConfig = multer.diskStorage({
       const extension=`.${splitExtension[1]}`
       const randomPrefix = Math.round(Math.random() * 1E9)
       const prefix = req.params.productId??randomPrefix
-      console.log(file)
+      // console.log(file)
       return cb(null, prefix+'-'+Date.now()+extension)
       
     }

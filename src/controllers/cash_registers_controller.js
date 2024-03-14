@@ -4,7 +4,7 @@ const db_connection = require('../../db_connection.js');
 const getCashMovements = async  (req, res) => {
     const cashOpenDate = req.params.cashOpenDate;
     const cashRegisterId = req.params.cashRegisterId;
-    console.log('the date: ',cashOpenDate)
+    // console.log('the date: ',cashOpenDate)
 
     const movementsQuery = `SELECT cm.cash_movement_id, cm.movement_type, cm.amount, cm.description, cm.movement_date, cr.name, u.first_name, u.last_name  FROM cash_movements cm
     INNER JOIN cash_registers cr ON cm.cash_register_id = cr.cash_register_id
@@ -254,7 +254,7 @@ const setOpenInfo = async (cashRegId, openAmount, userId) => {
 
 const setCloseInfo = async (opcdId, closeAmount) => {
     const values = [closeAmount, opcdId]
-    console.log(values)
+    // console.log(values)
     const query = `update open_close_details set close_date = now(), close_amount=? 
     WHERE 
     open_close_details_id = ?`
@@ -276,7 +276,7 @@ const setCloseInfo = async (opcdId, closeAmount) => {
 const getCashRegTotals = async (req, res)=>{
     const crId = req.params.cashRegisterId
     const crOpenDate = req.params.cashOpenDate
-    console.log('diop: ',crOpenDate)
+    // console.log('diop: ',crOpenDate)
     const query = `SELECT SUM(CASE WHEN payment_method = 'tarjeta' THEN total ELSE 0 END) AS card_total, SUM(CASE WHEN payment_method = 'efectivo' THEN total ELSE 0 END) AS cash_total FROM orders WHERE order_date >= '${crOpenDate}' and cash_register_id= ${crId}`
     try{
          const result = await queryAsync(query)

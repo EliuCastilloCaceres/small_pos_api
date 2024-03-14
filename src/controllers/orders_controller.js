@@ -83,7 +83,7 @@ const getDayOrders = (req, res) => {
     })
 }
 const getOrdersByDateRange = (req, res) => {
-    console.log(req.params)
+    // console.log(req.params)
     const startDate = req.params.startDate
     const endDate = req.params.endDate
     const order = req.params.order
@@ -151,7 +151,7 @@ const createOrder = async (req, res) => {
         await reduceStock(products)
         await queryAsync(query, values)
         const lastOrderId = await findLastOrder()
-        console.log(lastOrderId)
+        // console.log(lastOrderId)
         await createOrderDetails(products, lastOrderId)
         const prods = await getAllProducts()
         const sizes = await getAllSizes()
@@ -166,7 +166,7 @@ const createOrder = async (req, res) => {
 
 }
 const updatedOrder = async (req, res) => {
-    console.log(req.body)
+    // console.log(req.body)
     const orderId = parseInt(req.params.orderId);
     const subTotal = req.body.subTotal;
     const discount = req.body.discount;
@@ -191,7 +191,7 @@ const updatedOrder = async (req, res) => {
     })
 }
 const changeOrderStatus = (req, res) => {
-    console.log(req.body)
+    // console.log(req.body)
     const orderId = parseInt(req.body.orderId);
     const status = req.body.status
 

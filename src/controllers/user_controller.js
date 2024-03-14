@@ -127,7 +127,7 @@ const createUser = (req, res) => {
 
 }
 const updateUser = (req, res) => {
-    console.log(req.body)
+    // console.log(req.body)
     const userId = req.params.userId;
     const firstName = req.body.firstName.trim();
     const lastName = req.body.lastName.trim();
@@ -143,7 +143,6 @@ const updateUser = (req, res) => {
     let query = '';
 
     if (password != '') {
-        console.log('hola')
         const newPassword = bcrypt.hashSync(password, 10);
         query = `update users set first_name='${firstName}', last_name='${lastName}', user_name='${userName}', password='${newPassword}', profile='${profile}', position='${position}', 
         adress='${adress}', zip_code='${zipCode}', state='${state}', city='${city}', phone_number='${phoneNumber}' where user_id=${userId}`
@@ -255,7 +254,7 @@ const isAuth = (req, res) => {
                             return res.status(500).json('Server Error: ' + error);
                         } else {
                             user[0].permissions = result[0]
-                            console.log(user[0])
+                            // console.log(user[0])
                             return res.status(200).json({ isLogged: true, user});
                         }
                     })

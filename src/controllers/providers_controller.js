@@ -25,7 +25,7 @@ const getProviderById = (req, res) => {
 
 }
 const createProvider = (req, res) => {
-    console.log(req.body)
+    // console.log(req.body)
     const name = req.body.name;
     const rfc = req.body.rfc;
     const zipCode = req.body.zipCode;

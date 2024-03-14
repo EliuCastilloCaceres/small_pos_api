@@ -25,10 +25,10 @@ const getProductById = (req, res) => {
     })
 }
 const createProduct = async (req, res) => {
-    console.log(req.body)
+    // console.log(req.body)
     //console.log(req.file)
     const sizes = JSON.parse(req.body.sizes)
-    console.log(sizes)
+    // console.log(sizes)
     let isVariable = req.body.isVariable ? 1 : 0;
     let sku = req.body.sku;
     const name = req.body.name;
@@ -73,12 +73,12 @@ const createProduct = async (req, res) => {
     }
 }
 const updateProduct = async (req, res) => {
-    console.log(req.body)
+    // console.log(req.body)
     const productId = parseInt(req.params.productId);
     const updates = JSON.parse(req.body.updates)
     const sizes = JSON.parse(req.body.sizes)
-    console.log(updates)
-    console.log(sizes)
+    // console.log(updates)
+    // console.log(sizes)
     if (updates.isVariable) updates.isVariable = 1
     else updates.isVariable = 0
     let imagePatch = ''
@@ -101,7 +101,7 @@ const updateProduct = async (req, res) => {
         imagePatch = 'image=?,'
         values.splice(9, 0, updates.image); // Insertar la imagen en la posición correcta del arreglo
     }
-    console.log('values:', values)
+    // console.log('values:', values)
     let updateProductQuery = `update products set is_variable=?, sku=?, name=?, description=?, color=?, purchase_price=?, sale_price=?, general_stock=?,
     uom=?,${imagePatch} provider_id=? where product_id = ?`;
     try {
@@ -117,7 +117,7 @@ const updateProduct = async (req, res) => {
                             s.stock,
                             s.size_id
                         ]
-                        console.log('u',sizeValues)
+                        // console.log('u',sizeValues)
                         const updateSizeQuery = `UPDATE sizes SET size=?, sku=?, stock=? WHERE size_id=?`
                         await queryAsync(updateSizeQuery, sizeValues)
                     } else {
@@ -127,7 +127,7 @@ const updateProduct = async (req, res) => {
                             s.stock,
                             productId
                         ]
-                        console.log('s',sizeValues)
+                        // console.log('s',sizeValues)
                         const insertSizeQuery = `INSERT INTO sizes (size,sku,stock,product_id) VALUES (?,?,?,?) `
                         await queryAsync(insertSizeQuery, sizeValues)
                     }
@@ -277,7 +277,7 @@ const getSizesByProductId = async (req, res) => {
     const query = `select * from sizes where product_id=${productId}`;
     try {
         const sizes = await queryAsync(query)
-        console.log(sizes)
+        // console.log(sizes)
         return res.status(200).json({ message: 'Succes Query', data: sizes });
     } catch (e) {
         return res.status(500).json('Server Error: ' + e);
@@ -285,15 +285,15 @@ const getSizesByProductId = async (req, res) => {
 
 }
 const createSizeByProductId = (req, res) => {
-    console.log(req.body)
+    // console.log(req.body)
     const productId = parseInt(req.params.productId)
     const size = req.body.size
     const sku = req.body.sku
     const stock = parseFloat(req.body.stock)
-    console.log(productId)
-    console.log(size)
-    console.log(sku)
-    console.log(stock)
+    // console.log(productId)
+    // console.log(size)
+    // console.log(sku)
+    // console.log(stock)
     const skuQuery = `select * from sizes where sku ='${sku}'`
     if (IsANumber(productId)) {
         db_connection.query(skuQuery, (error, result) => {
@@ -333,7 +333,7 @@ const createSizeByProductId = (req, res) => {
 
 const updateSizeBySizeId = (req, res) => {
 
-    console.log(req.body)
+    // console.log(req.body)
     const sizeId = req.params.sizeId;
     const size = req.body.size;
     const sku = req.body.sku;
@@ -370,7 +370,7 @@ const deleteSizeBySizeId = (req, res) => {
 //--------------------------------------------------*** END Sizes Section *---------------------------------------/
 //--------------------------------------------------***  Inventory Section *---------------------------------------/
 const getAllProductInventory = async (req, res) => {
-    console.log(req.body)
+    // console.log(req.body)
     const satrtDate = req.params.startDate;
     const endDate = req.params.endDate;
     const operationType = req.params.operationType;
