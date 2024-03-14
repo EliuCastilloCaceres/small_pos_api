@@ -5,6 +5,7 @@ const ensureToken = require('../middlewares/ensureToken.js');
 const upload = require('../middlewares/uploadProductImage.js');
 
 router.get('/customers',ensureToken.ensureToken,customersController.getAllCustomers);
+router.get('/customers/generic-customer',ensureToken.ensureToken,customersController.getGenericCustomerId);
 router.get('/customers/:customerId',ensureToken.ensureToken,customersController.getCustomerById);
 router.post('/customers/create',ensureToken.ensureToken,upload.noneUpload,customersController.createCustomer);
 router.put('/customers/:customerId/update',ensureToken.ensureToken,customersController.updateCustomer);

@@ -11,6 +11,9 @@ router.put('/products/update/:productId',ensureToken.ensureToken,upload.producti
 router.put('/products/generalstock/:productId/update',ensureToken.ensureToken, productsController.updateGeneralStock);
 router.delete('/products/delete/:productId',ensureToken.ensureToken, productsController.deleteProduct);
 
+router.get('/products/inventory/getAll/:startDate/:endDate/:operationType',ensureToken.ensureToken, productsController.getAllProductInventory);
+router.post('/products/inventory/create',ensureToken.ensureToken, productsController.createProductInventory);
+
 router.post('/products/returns/create',ensureToken.ensureToken, productsController.createReturn);
 router.post('/products/:productId/returns/:returnId/details/create',ensureToken.ensureToken, productsController.createReturnDetails);
 router.put('/products/returns/update/:returnId',ensureToken.ensureToken, productsController.updateReturn);

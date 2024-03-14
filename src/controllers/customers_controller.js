@@ -24,6 +24,17 @@ const getCustomerById = (req,res)=>{
     })
 
 }
+const getGenericCustomerId = (req,res)=>{
+    const query = `select customer_id from customers where is_active=1 and first_name = '-'`
+    db_connection.query(query,(error, result)=>{
+        if(error){
+            return res.status(500).json('Server Error: ' + error);
+        }else{
+            return res.status(200).json({message:`Success query`, data:result});
+        }
+    })
+
+}
 const createCustomer =(req,res)=>{
 
     const firstName = req.body.firstName.trim();
@@ -93,5 +104,5 @@ const deleteCustomer =(req,res)=>{
 
 module.exports =
 {
-    createCustomer,updateCustomer,deleteCustomer,getAllCustomers, getCustomerById
+    createCustomer,updateCustomer,deleteCustomer,getAllCustomers, getCustomerById, getGenericCustomerId
 }
