@@ -303,11 +303,12 @@ const updateReceipt= (req,res)=>{
     const receiptId =  req.body.receiptId
     const address =  req.body.address
     const rfc =  req.body.rfc
+    const store =  req.body.store
     let image = ''
-    let query = `update receipt set address = '${address}', rfc='${rfc}' where receipt_id =${receiptId}`
+    let query = `update receipt set address = '${address}', rfc='${rfc}', store = '${store}' where receipt_id =${receiptId}`
     if (req.file) {
         image = req.file.filename
-         query = `update receipt set image='${image}', address = '${address}', rfc='${rfc}' where receipt_id =${receiptId}`
+         query = `update receipt set image='${image}', address = '${address}', rfc='${rfc}', store = '${store}' where receipt_id =${receiptId}`
     }
     
     db_connection.query(query, (error, result) => {

@@ -47,53 +47,73 @@ const getUserById = (req, res) => {
 }
 
 
-const login = (req, res) => {
+const login = async (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
     //console.log(req);
-    if (username == "" || password == "") {
-        return res.status(404).json({ ErrorMessage: 'Password or username field is empty' });
-    } else {
-        const query = `select * from users where user_name='${username}' AND is_active = 1`;
-        db_connection.query(query, (error, result) => {
-            if (error) {
-                return res.status(500).json('Server Error: ' + error);
+    try{
+        const userCountResult = await queryAsync('SELECT COUNT(*) AS userCount FROM users')
+        const userCount = userCountResult[0].userCount
+        // console.log(userCount)
+        if(userCount===0){
+            const newUsername = 'admin'
+            const newProfile = 'administrador'
+            const newPassword = bcrypt.hashSync('admin', 10)
+           
+            const values = [newUsername,newProfile,newPassword]
+            console.log(values)
+            const newUserQuery = `INSERT INTO users (user_name,profile,password) VALUES (?,?,?)`
+            await queryAsync(newUserQuery,values)
+            const result = await queryAsync('SELECT user_id FROM users ORDER BY user_id DESC LIMIT 1')
+            const userId = result[0].user_id
+            await queryAsync(`INSERT INTO permissions (pos, dashboard, orders, products,providers,users,customers,settings, user_id) VALUES(1,1,1,1,1,1,1,1,${userId})`)
+            return res.status(201).json({ message: 'Usuario Creado' });
+
+        }else{
+            if (username == "" || password == "") {
+                return res.status(404).json({ ErrorMessage: 'Password or username field is empty' });
             } else {
-                if (result.length > 0) {
-                    //console.log(result)
-                    if (bcrypt.compareSync(password, result[0].password)) {
-                        delete result[0].password;
-                        jwt.sign({ user: result }, process.env.SECRET_KEY, (error, token) => {
+                const userQuery = `select * from users where user_name='${username}' AND is_active = 1`;
+                const user = await queryAsync(userQuery)
+                if (user.length > 0) {
+                    if (bcrypt.compareSync(password, user[0].password)) {
+                        delete user[0].password;
+                        jwt.sign({ user: user }, process.env.SECRET_KEY, (error, token) => {
                             if (error) {
                                 return res.status(500).json({ errorMessage: 'Unexpected error generating token ' + error })
                             } else {
 
-                                return res.status(200).json({ message: 'Succes', token: token, user: result[0] });
+                                return res.status(200).json({ message: 'Succes', token: token, user: user[0] });
                             }
                         });
                     } else {
                         return res.status(401).json({ errorMessage: 'incorrect credentials' });
                     }
-                } else {
+                }else{
                     return res.status(401).json({ errorMessage: 'incorrect credentials' });
                 }
+                
+                
             }
-        })
+        }
+    }catch(e){
+        return res.status(500).json('Server Error: ' + e);
     }
+    
 }
 
 const createUser = (req, res) => {
-    const firstName = req.body.firstName.trim();
-    const lastName = req.body.lastName.trim();
-    const userName = req.body.userName.trim();
-    const password = bcrypt.hashSync(req.body.password.trim(), 10)
-    const profile = req.body.profile.trim();
-    const position = req.body.position.trim();
-    const adress = req.body.adress.trim();
-    const zipCode = req.body.zipCode.trim();
-    const state = req.body.state.trim();
-    const city = req.body.city.trim();
-    const phoneNumber = req.body.phoneNumber.trim();
+    const firstName = req.body.firstName;
+    const lastName = req.body.lastName;
+    const userName = req.body.userName;
+    const password = bcrypt.hashSync(req.body.password, 10)
+    const profile = req.body.profile;
+    const position = req.body.position;
+    const adress = req.body.adress;
+    const zipCode = req.body.zipCode;
+    const state = req.body.state;
+    const city = req.body.city;
+    const phoneNumber = req.body.phoneNumber;
     //formateado de fecha.
     // const fecha = new Date();
     // const año = fecha.getFullYear();
@@ -129,17 +149,17 @@ const createUser = (req, res) => {
 const updateUser = (req, res) => {
     // console.log(req.body)
     const userId = req.params.userId;
-    const firstName = req.body.firstName.trim();
-    const lastName = req.body.lastName.trim();
-    const userName = req.body.userName.trim();
-    const password = req.body.password.trim();
-    const profile = req.body.profile.trim();
-    const position = req.body.position.trim();
-    const adress = req.body.adress.trim();
-    const zipCode = req.body.zipCode.trim();
-    const state = req.body.state.trim();
-    const city = req.body.city.trim();
-    const phoneNumber = req.body.phoneNumber.trim();
+    const firstName = req.body.firstName;
+    const lastName = req.body.lastName;
+    const userName = req.body.userName;
+    const password = req.body.password;
+    const profile = req.body.profile;
+    const position = req.body.position;
+    const adress = req.body.adress;
+    const zipCode = req.body.zipCode;
+    const state = req.body.state;
+    const city = req.body.city;
+    const phoneNumber = req.body.phoneNumber;
     let query = '';
 
     if (password != '') {
@@ -231,6 +251,31 @@ const updateUserPermissions = (req, res) => {
             return res.status(200).json({ message: 'Permissions Updated Successfully' });
         }
     })
+}
+const queryAsync = (query, values = null) => {
+    return new Promise((resolve, reject) => {
+        if (values) {
+            db_connection.query(query, values, (error, result) => {
+
+                if (error) reject(error)
+
+                resolve(result)
+
+            })
+
+        } else {
+            db_connection.query(query, (error, result) => {
+
+                if (error) reject(error)
+
+                resolve(result)
+
+            })
+        }
+
+
+    })
+
 }
 
 const isAuth = (req, res) => {

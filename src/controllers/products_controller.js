@@ -25,7 +25,7 @@ const getProductById = (req, res) => {
     })
 }
 const createProduct = async (req, res) => {
-     //console.log(req.body)
+    //  console.log(req.body)
     //console.log(req.file)
     const sizes = JSON.parse(req.body.sizes)
      //console.log(sizes)
