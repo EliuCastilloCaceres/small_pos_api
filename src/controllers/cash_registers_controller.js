@@ -183,7 +183,7 @@ const deleteCashReg = (req, res) => {
 //--------------------------------------------------*** Open/Close details Section *---------------------------------------/
 
 const openCashReg = async (req, res) => {
-    console.log(req.body)
+    // console.log(req.body)
     const cashRegisterId = req.params.cashRegisterId;
     const openAmount = parseFloat(req.body.openAmount);
     const userId = parseInt(req.body.userId);

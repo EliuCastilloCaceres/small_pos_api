@@ -25,10 +25,10 @@ const getProductById = (req, res) => {
     })
 }
 const createProduct = async (req, res) => {
-    // console.log(req.body)
+     //console.log(req.body)
     //console.log(req.file)
     const sizes = JSON.parse(req.body.sizes)
-    // console.log(sizes)
+     //console.log(sizes)
     let isVariable = req.body.isVariable ? 1 : 0;
     let sku = req.body.sku;
     const name = req.body.name;

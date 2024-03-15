@@ -196,10 +196,10 @@ const createUserPermissions = (req, res) => {
     const providers = req.body.providers ? 1 : 0
     const users = req.body.users ? 1 : 0
     const customers = req.body.customers ? 1 : 0
-    const settings = req.body.customers ? 1 : 0
+    const settings = req.body.settings ? 1 : 0
 
     const values = [pos, dashboard, orders, products, providers, users, customers,settings, userId]
-    console.log(values)
+    //console.log(values)
     const userPermissionsCreateQuery = 'insert into permissions (pos,dashboard,orders,products,providers,users,customers,settings,user_id) values(?,?,?,?,?,?,?,?,?)'
     db_connection.query(userPermissionsCreateQuery, values, (error, result) => {
         if (error) {
@@ -219,7 +219,7 @@ const updateUserPermissions = (req, res) => {
     const providers = req.body.providers ? 1 : 0
     const users = req.body.users ? 1 : 0
     const customers = req.body.customers ? 1 : 0
-    const settings = req.body.customers ? 1 : 0
+    const settings = req.body.settings ? 1 : 0
 
     const values = [pos, dashboard, orders, products, providers, users, customers, settings, userId]
     //console.log(values)
