@@ -50,7 +50,7 @@ const getUserById = (req, res) => {
 const login = async (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
-    //console.log(req);
+    // console.log(req);
     try{
         const userCountResult = await queryAsync('SELECT COUNT(*) AS userCount FROM users')
         const userCount = userCountResult[0].userCount

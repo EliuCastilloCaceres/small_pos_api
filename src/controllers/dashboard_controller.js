@@ -34,6 +34,7 @@ const getDashboardInfo = async (req, res) => {
         const cashRegistersInfo = await queryAsync(cashRegistersInfoQuery)
         const orderTotals = await queryAsync(ordersTotalQuery)
         orderTotals[0].products = totalProductsSold[0].total_sold
+        console.log(productsSold,cashRegistersInfo,orderTotals)
         return res.status(200).json({ productsSold, cashRegistersInfo, orderTotals});
     }catch(e){
         return res.status(500).json('Server Error: ' + e);

@@ -3,6 +3,7 @@ require('dotenv').config();
 const cors = require('cors');
 const app = express();
 const path = require('path');
+
 const cookieParser = require('cookie-parser')
 const dashboardRoutes = require('./src/routes/dashboard_routes.js')
 const userRoutes = require('./src/routes/user_routes.js')
@@ -19,7 +20,8 @@ app.use(cors());
 app.use(cookieParser());
 app.use('/product/images',express.static(path.join(__dirname,'/public/images/products')))
 app.use('/receipt/images',express.static(path.join(__dirname,'/public/images/receipt')))
-//Index Routes
+
+
 app.get('/',(req, res)=>{
    res.send('Welcome to the small pos api');
 })

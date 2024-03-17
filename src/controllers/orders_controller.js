@@ -40,6 +40,7 @@ const getproductsSold = async (req, res) => {
     try{
         const productsSold = await queryAsync(productsSoldQuery)
         const productsSoldTotal = await queryAsync(productsSoldTotalQuery)
+        console.log(productsSold,productsSoldTotal[0])
        
         return res.status(200).json({ products:productsSold, total:productsSoldTotal[0].total});
     }catch(e){

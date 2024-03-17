@@ -382,6 +382,7 @@ const getAllProductInventory = async (req, res) => {
 
     try {
         const result = await queryAsync(getOperations)
+        console.log(result)
         return res.status(200).json({ message: 'Operación Exitosa', data: result });
     } catch (e) {
         return res.status(500).json('Server Error: ' + e);
