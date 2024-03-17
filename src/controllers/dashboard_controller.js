@@ -9,7 +9,7 @@ const getDashboardInfo = async (req, res) => {
     INNER JOIN products p ON od.product_id = p.product_id 
     INNER JOIN orders o ON od.order_id = o.order_id 
     WHERE o.order_date BETWEEN '${querydate}' AND '${querydate} 23:59:59 ' 
-    GROUP BY od.product_id 
+    GROUP BY od.product_id, o.order_date
     ORDER BY total_sold DESC`
 
     const totalProductsSoldQuery = `select SUM(od.quantity) as total_sold FROM 
