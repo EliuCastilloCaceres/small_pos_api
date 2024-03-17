@@ -25,7 +25,7 @@ const getDashboardInfo = async (req, res) => {
     INNER JOIN cash_registers cr ON ocd.cash_register_id = cr.cash_register_id 
     INNER JOIN users u ON ocd.user_id = u.user_id 
     LEFT JOIN cash_movements m ON cr.cash_register_id = m.cash_register_id WHERE cr.is_open = 1 AND ocd.close_date IS NULL AND m.movement_date >= ocd.open_date 
-    GROUP BY cr.name, u.first_name, u.last_name`
+    GROUP BY cr.name, u.first_name, u.last_name, cr.cash_register_id`
     const ordersTotalQuery = `SELECT COUNT(order_id) as orders_total, SUM(total) as income FROM orders WHERE order_date >= '${querydate}' AND status='completado'`
   
     try{
