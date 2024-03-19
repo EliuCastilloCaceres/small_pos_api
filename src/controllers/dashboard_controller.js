@@ -4,12 +4,12 @@ const getDashboardInfo = async (req, res) => {
     
     const querydate = req.params.date;
 
-    const productsSoldQuery = `select od.product_id, p.sku, p.image, p.name, SUM(od.quantity) as total_sold, o.order_date FROM 
+    const productsSoldQuery = `select od.product_id, p.sku, p.image, p.name, SUM(od.quantity) as total_sold FROM 
     orders_details od 
     INNER JOIN products p ON od.product_id = p.product_id 
     INNER JOIN orders o ON od.order_id = o.order_id 
     WHERE o.order_date BETWEEN '${querydate}' AND '${querydate} 23:59:59 ' 
-    GROUP BY od.product_id, o.order_date
+    GROUP BY od.product_id
     ORDER BY total_sold DESC`
 
     const totalProductsSoldQuery = `select SUM(od.quantity) as total_sold FROM 
@@ -34,7 +34,7 @@ const getDashboardInfo = async (req, res) => {
         const cashRegistersInfo = await queryAsync(cashRegistersInfoQuery)
         const orderTotals = await queryAsync(ordersTotalQuery)
         orderTotals[0].products = totalProductsSold[0].total_sold
-        console.log(productsSold,cashRegistersInfo,orderTotals)
+        console.log('prodS:',productsSold)
         return res.status(200).json({ productsSold, cashRegistersInfo, orderTotals});
     }catch(e){
         return res.status(500).json('Server Error: ' + e);

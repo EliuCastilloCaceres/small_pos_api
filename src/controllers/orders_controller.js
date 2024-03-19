@@ -210,10 +210,11 @@ const changeOrderStatus = (req, res) => {
 
 //--------------------------------------------------*** Order Details Section *---------------------------------------/
 const createOrderDetails = async (products,orderId) => {
-    try {
-        // const values = [orderId, productId, sizeId, finalPrice, quantity];
-        db_connection.beginTransaction();
-
+    db_connection.getConnection((err,conn)=>{
+        if(err){
+            return res.status(500).json("Server Error: " + err);
+        }
+        conn.beginTransaction()
         for (const product of products) {
             const productId = product.product_id
             let sizeId = null
@@ -224,18 +225,42 @@ const createOrderDetails = async (products,orderId) => {
             const quantity = parseFloat(product.qty)
 
             const query = `insert into orders_details (order_id, product_id, size_id, final_price, quantity) values (${orderId},${productId},${sizeId},${finalPrice},${quantity}) `
-            await queryAsync(query)
+            queryAsync(query).then(()=>{
+                conn.commit()
+                return 'Todos los productos se añadieron a los detalles exitosamente' 
+            }).catch(e=>{
+                conn.rollback()
+                throw 'Se produjo un error inesperado al añadir los detalles: ' + e 
+            }).finally(()=>{conn.release()})
         }
-        // Confirmar la transacción si todas las actualizaciones se realizan con éxito
-        db_connection.commit();
-        return 'Todos los productos se añadieron a los detalles exitosamente' 
+        
+    })
+    // try {
+    //     // const values = [orderId, productId, sizeId, finalPrice, quantity];
+    //     db_connection.beginTransaction();
 
-    } catch (error) {
-        // Revertir la transacción si ocurre un error
-        db_connection.rollback();
-        throw 'Se produjo un error inesperado al añadir los detalles: ' + error 
+    //     for (const product of products) {
+    //         const productId = product.product_id
+    //         let sizeId = null
+    //         if (product.size) {
+    //             sizeId = product.size.size_id
+    //         }
+    //         const finalPrice = parseFloat(product.sale_price)
+    //         const quantity = parseFloat(product.qty)
 
-    }
+    //         const query = `insert into orders_details (order_id, product_id, size_id, final_price, quantity) values (${orderId},${productId},${sizeId},${finalPrice},${quantity}) `
+    //         await queryAsync(query)
+    //     }
+    //     // Confirmar la transacción si todas las actualizaciones se realizan con éxito
+    //     db_connection.commit();
+    //     return 'Todos los productos se añadieron a los detalles exitosamente' 
+
+    // } catch (error) {
+    //     // Revertir la transacción si ocurre un error
+    //     db_connection.rollback();
+    //     throw 'Se produjo un error inesperado al añadir los detalles: ' + error 
+
+    // }
 }
 // const createOrderDetails = (req,res)=>{
 
@@ -353,29 +378,56 @@ const createCashMovement = async (amount,cashRegisterId,userId,orderId)=>{
     }
 }
 const reduceStock = async (products) => {
-    try {
-        db_connection.beginTransaction();
-        for (const product of products) {
-            const query = `update products set general_stock = general_stock - ${product.qty} where product_id = ${product.product_id} `
-
-            await queryAsync(query)
-            // Si hay una variante, actualizar el stock de la variante
-            if (product.size) {
-                const variantQuery = `UPDATE sizes SET stock = stock - ${product.qty} WHERE size_id = ${product.size.size_id}`;
-                await queryAsync(variantQuery); // Suponiendo que queryAsync es una función que ejecuta la consulta y devuelve una promesa
-            }
-
+    db_connection.getConnection((err,conn)=>{
+        if(err){
+            return res.status(500).json('Server Error: ' + err);
         }
-        // Confirmar la transacción si todas las actualizaciones se realizan con éxito
-        db_connection.commit();
-        return { status: 201, message: 'Todos los productos se actualizaron exitosamente' };
+        conn.beginTransaction()
+            for (const product of products) {
+            const query = `update products set general_stock = general_stock - ${product.qty} where product_id = ${product.product_id} `
+            queryAsync(query).then(()=>{
+                if (product.size) {
+                    const variantQuery = `UPDATE sizes SET stock = stock - ${product.qty} WHERE size_id = ${product.size.size_id}`;
+                    queryAsync(variantQuery).then().catch(e=>{
+                        conn.rollback()
+                        throw { status: 500, message: 'Se produjo un error inesperado al actualizar el stock: ' + e };
+                    })
+                }
+                conn.commit();
+                return { status: 201, message: 'Todos los productos se actualizaron exitosamente' };
+            }).catch(e=>{
+                conn.rollback()
+                throw { status: 500, message: 'Se produjo un error inesperado al actualizar el stock: ' + e };
+            }).finally(()=>{
+                conn.release()
+            })
+           
+        }
+        
+    })
+    // try {
+    //     db_connection.beginTransaction();
+    //     for (const product of products) {
+    //         const query = `update products set general_stock = general_stock - ${product.qty} where product_id = ${product.product_id} `
 
-    } catch (error) {
-        // Revertir la transacción si ocurre un error
-        db_connection.rollback();
-        throw { status: 500, message: 'Se produjo un error inesperado al actualizar el stock: ' + error };
+    //         await queryAsync(query)
+    //         // Si hay una variante, actualizar el stock de la variante
+    //         if (product.size) {
+    //             const variantQuery = `UPDATE sizes SET stock = stock - ${product.qty} WHERE size_id = ${product.size.size_id}`;
+    //             await queryAsync(variantQuery); // Suponiendo que queryAsync es una función que ejecuta la consulta y devuelve una promesa
+    //         }
 
-    }
+    //     }
+    //     // Confirmar la transacción si todas las actualizaciones se realizan con éxito
+    //     db_connection.commit();
+    //     return { status: 201, message: 'Todos los productos se actualizaron exitosamente' };
+
+    // } catch (error) {
+    //     // Revertir la transacción si ocurre un error
+    //     db_connection.rollback();
+    //     throw { status: 500, message: 'Se produjo un error inesperado al actualizar el stock: ' + error };
+
+    // }
 }
 
 module.exports =
