@@ -8,14 +8,14 @@ const getDashboardInfo = async (req, res) => {
     orders_details od 
     INNER JOIN products p ON od.product_id = p.product_id 
     INNER JOIN orders o ON od.order_id = o.order_id 
-    WHERE o.order_date BETWEEN '${querydate}' AND '${querydate} 23:59:59 ' 
+    WHERE o.order_date BETWEEN '${querydate}' AND '${querydate} 23:59:59' AND o.status = 'completado' 
     GROUP BY od.product_id
     ORDER BY total_sold DESC`
 
     const totalProductsSoldQuery = `select SUM(od.quantity) as total_sold FROM 
     orders_details od 
     INNER JOIN orders o ON od.order_id = o.order_id 
-    WHERE o.order_date BETWEEN '${querydate}' AND '${querydate} 23:59:59' `
+    WHERE o.order_date BETWEEN '${querydate}' AND '${querydate} 23:59:59' AND o.status = 'completado' `
 
     const cashRegistersInfoQuery = `SELECT cr.cash_register_id, cr.name, u.first_name, u.last_name, 
     SUM(CASE WHEN m.movement_type = 'deposito' THEN m.amount ELSE 0 END) AS deposits_total, 
@@ -34,7 +34,7 @@ const getDashboardInfo = async (req, res) => {
         const cashRegistersInfo = await queryAsync(cashRegistersInfoQuery)
         const orderTotals = await queryAsync(ordersTotalQuery)
         orderTotals[0].products = totalProductsSold[0].total_sold
-        console.log('prodS:',productsSold)
+        // console.log('prodS:',productsSold)
         return res.status(200).json({ productsSold, cashRegistersInfo, orderTotals});
     }catch(e){
         return res.status(500).json('Server Error: ' + e);

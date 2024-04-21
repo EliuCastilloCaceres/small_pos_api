@@ -29,14 +29,14 @@ const getproductsSold = async (req, res) => {
     INNER JOIN orders o ON od.order_id = o.order_id 
     INNER JOIN products p ON od.product_id = p.product_id 
     LEFT JOIN sizes s ON od.size_id = s.size_id 
-    WHERE ${skuPatch} o.order_date BETWEEN '${startDate}' AND '${endDate} 23:59:59' ORDER BY o.order_date DESC`
+    WHERE ${skuPatch} o.order_date BETWEEN '${startDate}' AND '${endDate} 23:59:59' AND o.status = 'completado' ORDER BY o.order_date DESC`
 
     const productsSoldTotalQuery = `SELECT SUM(od.quantity) as total 
     FROM orders_details od 
     INNER JOIN orders o ON od.order_id = o.order_id 
     INNER JOIN products p ON od.product_id = p.product_id 
     LEFT JOIN sizes s ON od.size_id = s.size_id 
-    WHERE ${skuPatch} o.order_date BETWEEN '${startDate}' AND '${endDate} 23:59:59' ORDER BY o.order_date DESC`
+    WHERE ${skuPatch} o.order_date BETWEEN '${startDate}' AND '${endDate} 23:59:59' AND o.status = 'completado' ORDER BY o.order_date DESC`
     try{
         const productsSold = await queryAsync(productsSoldQuery)
         const productsSoldTotal = await queryAsync(productsSoldTotalQuery)
