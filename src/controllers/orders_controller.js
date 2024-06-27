@@ -191,19 +191,86 @@ const updatedOrder = async (req, res) => {
         }
     })
 }
-const changeOrderStatus = (req, res) => {
-    // console.log(req.body)
+const changeOrderStatus = async (req, res) => {
+    //  console.log(req.body)
     const orderId = parseInt(req.body.orderId);
     const status = req.body.status
 
+        const findOrderProductsQuery = `select * from orders_details where order_id = ${orderId}`
+        const orderProducts = await queryAsync(findOrderProductsQuery)
+       if(status=='cancelado'){
+            addStock(orderProducts)
+       }else{
+            substractStock(orderProducts)
+       }
     const query = `update orders set status = '${status}' where order_id = ${orderId}`
 
     db_connection.query(query, (error, result) => {
         if (error) {
             return res.status(500).json('Server Error: ' + error);
         } else {
-            return res.status(200).json({ message: `Order Canceled successfully` });
+            return res.status(200).json({ message: `Order updated successfully` });
         }
+    })
+}
+const addStock  = (products)=>{
+    db_connection.getConnection((err,conn)=>{
+        if(err){
+            return res.status(500).json('Server Error: ' + err);
+        }
+        conn.beginTransaction()
+        products.forEach(pd => {
+            const query = `update products set general_stock = general_stock + ${pd.quantity} where product_id = ${pd.product_id} `
+            queryAsync(query).then(()=>{
+                if(pd.size_id){
+                    const variantQuery = `UPDATE sizes SET stock = stock + ${pd.quantity} WHERE size_id = ${pd.size_id}`;
+                    queryAsync(variantQuery).then().catch(e=>{
+                        conn.rollback()
+                        throw { status: 500, message: 'Se produjo un error inesperado al actualizar el stock: ' + e };
+                    })
+                }
+                conn.commit();
+                return { status: 201, message: 'Todos los productos se actualizaron exitosamente' };
+            }).catch(e=>{
+                conn.rollback()
+                throw { status: 500, message: 'Se produjo un error inesperado al actualizar el stock: ' + e };
+            }).finally(()=>{
+                conn.release()
+            })
+            
+        });
+           
+        
+    })
+}
+const substractStock  = (products)=>{
+    db_connection.getConnection((err,conn)=>{
+        if(err){
+            return res.status(500).json('Server Error: ' + err);
+        }
+        conn.beginTransaction()
+        products.forEach(pd => {
+            const query = `update products set general_stock = general_stock - ${pd.quantity} where product_id = ${pd.product_id} `
+            queryAsync(query).then(()=>{
+                if(pd.size_id){
+                    const variantQuery = `UPDATE sizes SET stock = stock - ${pd.quantity} WHERE size_id = ${pd.size_id}`;
+                    queryAsync(variantQuery).then().catch(e=>{
+                        conn.rollback()
+                        throw { status: 500, message: 'Se produjo un error inesperado al actualizar el stock: ' + e };
+                    })
+                }
+                conn.commit();
+                return { status: 201, message: 'Todos los productos se actualizaron exitosamente' };
+            }).catch(e=>{
+                conn.rollback()
+                throw { status: 500, message: 'Se produjo un error inesperado al actualizar el stock: ' + e };
+            }).finally(()=>{
+                conn.release()
+            })
+            
+        });
+           
+        
     })
 }
 //--------------------------------------------------*** END Order Section *---------------------------------------/

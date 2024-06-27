@@ -6,6 +6,7 @@ const upload = require('../middlewares/uploadReceiptImage.js');
 
 router.get('/cash-registers/:cashRegisterId/:cashOpenDate/movements',ensureToken.ensureToken,cashRegController.getCashMovements);
 router.post('/cash-registers/:cashRegisterId/movements/create',ensureToken.ensureToken,cashRegController.createCashMovement);
+router.post('/cash-registers/transactions',ensureToken.ensureToken,cashRegController.getCashTransactions);
 router.put('/cash-registers/:cashRegisterId/movements/:cashMovementId/update',ensureToken.ensureToken,cashRegController.updateCashMovement);
 router.delete('/cash-registers/:cashRegisterId/movements/:cashMovementId/delete',ensureToken.ensureToken,cashRegController.deleteCashMovement);
 

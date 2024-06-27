@@ -1,6 +1,43 @@
 const db_connection = require('../../db_connection.js');
 
 //--------------------------------------------------*** CashReg Movements Section *---------------------------------------/
+const getCashTransactions = async (req,res)=>{
+    const startDate = req.body.startDate;
+    const endDate = req.body.endDate;
+    const type = req.body.type;
+    const crId = req.body.crId;
+    let typePatch = ''
+    let idPatch = ''
+    // console.log(startDate, endDate,type,crId)
+    if(crId){
+        parseInt(crId)
+         idPatch=`and cm.cash_register_id =${crId}`
+    }
+    if(type) typePatch=`and cm.movement_type ='${type}'`
+  
+
+    const movementsQuery = `SELECT cm.cash_movement_id, cm.movement_type, cm.amount, cm.description, cm.movement_date, cr.cash_register_id, cr.name, u.first_name, u.last_name  FROM cash_movements cm
+    INNER JOIN cash_registers cr ON cm.cash_register_id = cr.cash_register_id
+    INNER JOIN users u ON cm.user_id = u.user_id
+    WHERE cm.movement_date between '${startDate}' and '${endDate} 23:59:59' ${typePatch} ${idPatch} order by cm.movement_date`
+
+    const totalsQuery = `SELECT SUM(CASE WHEN cm.movement_type = 'deposito' THEN cm.amount ELSE 0 END) AS deposits_total, 
+    SUM(CASE WHEN cm.movement_type = 'retiro' THEN cm.amount ELSE 0 END) AS withdrawals_total,
+    (SUM(CASE WHEN cm.movement_type = 'deposito' THEN cm.amount ELSE 0 END) - SUM(CASE WHEN cm.movement_type = 'retiro' THEN cm.amount ELSE 0 END)) AS balance
+    FROM cash_movements cm WHERE cm.movement_date between '${startDate}' and '${endDate} 23:59:59' ${idPatch} `
+
+    try{
+        // console.log(movementsQuery)
+        const data = await queryAsync(movementsQuery)
+        const totals = await queryAsync(totalsQuery)
+        // console.log('the resp: ',data)
+        return res.status(200).json({message:'Everything Ok', data, totals})
+    }catch(e){
+        return res.status(500).json({message:'Something went wrong '+e})
+    }
+
+    
+}
 const getCashMovements = async  (req, res) => {
     const cashOpenDate = req.params.cashOpenDate;
     const cashRegisterId = req.params.cashRegisterId;
@@ -350,5 +387,5 @@ module.exports =
 {
     openCashReg, closeCashReg, createCashReg, updateCashReg, deleteCashReg,getCashMovements,
     createCashMovement, updateCashMovement, deleteCashMovement, getAllCashReg, getCashRegStatusById,getcashRegsOpen, getReceipt,updateReceipt,
-    getCashRegTotals
+    getCashRegTotals, getCashTransactions
 }
